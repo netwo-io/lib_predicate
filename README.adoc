@@ -1,0 +1,103 @@
+=== Rules/Predicates for PostgreSQL (PL/pgSQL)
+
+
+=== Features
+- [x] multi-tenant
+- [x] maintains a materialized view of the JSON predicate in SQL format
+
+-- resource.type : type_is/type_is_not arg:{list<type>}
+-- resource.service: service_is/service_is_not  arg:{list<service>}
+-- resource.name: string_is/string_is_not/string_starts_with/string_ends_with arg:{string}
+
+-- time.schedule.day_of_week : date_before_or_on/date_after_or_on/date_after/date_before/date_on arg:{list<day_of_week>, list<timezone>}
+-- time.schedule.hour_of_day
+
+-- recherche sur les contrats
+
+{
+"logicalType_id": "any",
+"predicates": [
+{
+"target_id": "contract.name",
+"operator_id": "contains",
+"argument": "XXX"
+},
+{
+"target_id": "document.name",
+"operator_id": "contains",
+"argument": "XXX"
+}
+]
+}
+
+== Réaction à des évènements
+
+targets=>operators=>widget:
+
+- event.id => lib_event.event.event__id
+- event.type => lib_event.event.event_type
+- event.payload.occurred_at
+- event.payload.created_at
+- event.payload.created_by
+- event.payload.source
+- event.payload.actor
+- event.payload.data.rejected_count
+
+
+(json)
+QUAND event.type EST payment_service.prelevement.rejected
+ET event.payload.data.rejected_count IS_HIGHER_THAN XX
+
+==>
+(sql)
+QUAND event.type EST payment_service.prelevement.rejected
+ET lib_rules.NUMBER_IS_HIGHER_THAN(event.payload#>>{'data','rejected_count'}, 10)
+
+
+execute format('select * from lib_event.event
+where %I', lib_rules.convert('{....}') // contract.name like "XXX" OR document.name like "XXX"
+
+=>
+
+select * from lib_event.event
+where event.type = 'payment_service.prelevement.rejected' and event.payload#>>{'data','rejected_count'} > 10
+
+
+== Filtrage de documents
+
+Targets:
+- name
+- type
+
+{
+"logicalType_id": "any",
+"predicates": [
+{
+"target_id": "name",
+"operator_id": "contains",
+"argument": "XXX"
+}
+]
+}
+
+
+execute format('select
+ct.name as "name"
+'contract' as "type',
+from contract_manager.contracts
+union
+select dc.name as "name"
+'document' as "type',
+from document_manager.documents
+where %I', lib_rules.convert('{....}') // contract.name like "XXX" OR document.name like "XXX"
+
+
+select * from lib_event.event where ( {{JSON => predicate SQL }} )
+
+
+=== Usage
+=== API
+
+=== SQL Conventions
+
+Code is written https://github.com/fgribreau/sql-convention/[following standard SQL-convention].
