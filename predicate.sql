@@ -141,7 +141,7 @@ begin
       when 'any' then operator$ = 'OR';
       when 'none' then
         operator$ = 'AND';
-        prefix$ = 'NOT';
+        prefix$ = 'NOT ';
       else
         raise 'unknown logical id' using errcode = 'check_violation';
     end case;
@@ -155,7 +155,7 @@ begin
       sub_statements = sub_statements || sub_elem.statement;
     end loop;
 
-    elem.statement = prefix$ || ' (' || array_to_string(sub_statements, ' ' || operator$ || ' ') || ')';
+    elem.statement = prefix$ || '(' || array_to_string(sub_statements, ' ' || operator$ || ' ') || ')';
     return elem;
 
   elsif body$->'target_id' is not null and body$->'operator_id' is not null then
@@ -211,9 +211,9 @@ create or replace function lib_predicate.tree_to_sql_query(predicate_tree$ jsonb
 $$
 declare
   extract$ lib_predicate.exploded_tree;
-  cols$       text[];
-  tables$     text[];
-  query$      text;
+  cols$    text[];
+  tables$  text[];
+  query$   text;
 begin
   extract$ = lib_predicate.explode_tree(predicate_tree$);
   tables$ = array(select distinct e from unnest(extract$.tables) as a(e));

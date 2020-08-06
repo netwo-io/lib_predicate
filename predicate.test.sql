@@ -239,7 +239,7 @@ begin
   perform lib_test.assert_equal(predicate_trees$->'predicates'#>'{predicates,1}'->>'target_id', 'article.title');
   perform lib_test.assert_equal(predicate_trees$->'predicates'#>'{predicates,1}'->>'argument', '["paradise"]');
 
-  sql_query$ = $_$select article.title, article.date, article.count from article where  (NOT (lib_predicate.timestamptz_between(article.date, '["2017-10-05", "2018-10-05"]') AND lib_predicate.timestamptz_between(article.date, '["2010-10-05", "2011-10-05"]')) AND lib_predicate.text_equal(article.title, '["paradise"]') AND lib_predicate.number_greater(article.count, '[2]'))$_$;
+  sql_query$ = $_$select article.title, article.count, article.date from article where (NOT (lib_predicate.timestamptz_between(article.date, '["2017-10-05", "2018-10-05"]') AND lib_predicate.timestamptz_between(article.date, '["2010-10-05", "2011-10-05"]')) AND lib_predicate.text_equal(article.title, '["paradise"]') AND lib_predicate.number_greater(article.count, '[2]'))$_$;
   perform lib_test.assert_equal(lib_predicate.tree_to_sql_query(predicate_tree__id$), sql_query$);
   perform lib_test.assert_equal(lib_predicate.tree_to_sql_query(predicate_trees$->'predicates'), sql_query$);
 end;
