@@ -23,7 +23,7 @@ create table lib_predicate.predicate
   compound_predicate__id uuid not null references lib_predicate.compound_predicate(compound_predicate__id) on delete cascade on update cascade,
   target__id             lib_predicate.target_identifier references lib_predicate.target(target__id) on delete cascade on update cascade,
   operator__id           lib_predicate.identifier references lib_predicate.operator(operator__id) on delete cascade on update cascade,
-  argument              jsonb not null check (argument::text ~* '^\[.*\]$')
+  argument               jsonb not null check (argument::text ~* '^\[.*\]$')
 );
 
 ------------------ TRIGGERS ---------------------------

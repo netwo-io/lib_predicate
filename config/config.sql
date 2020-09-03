@@ -51,7 +51,7 @@ create table lib_predicate.target
 create table lib_predicate.widget
 (
   widget__id lib_predicate.identifier primary key,
-  label             lib_predicate.label
+  label      lib_predicate.label
 );
 
 comment on table lib_predicate.widget is 'UI widget pickers list.';
@@ -59,10 +59,10 @@ comment on column lib_predicate.widget.widget__id is 'List all availables ui wid
 
 create table lib_predicate.operator
 (
-  operator__id      lib_predicate.identifier primary key,
-  label             lib_predicate.label,
-  type__id          lib_predicate.identifier references lib_predicate.type(type__id) on delete restrict on update cascade,
-  widget__id lib_predicate.identifier references lib_predicate.widget(widget__id) on delete restrict on update cascade
+  operator__id lib_predicate.identifier primary key,
+  label        lib_predicate.label,
+  type__id     lib_predicate.identifier references lib_predicate.type(type__id) on delete restrict on update cascade,
+  widget__id   lib_predicate.identifier references lib_predicate.widget(widget__id) on delete restrict on update cascade
 );
 
 comment on column lib_predicate.operator.operator__id is 'Comparison operator function identifier e.g: "text_ends_width", "timestamptz_before"...';
