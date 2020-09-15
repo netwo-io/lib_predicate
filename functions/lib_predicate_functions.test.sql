@@ -8,7 +8,9 @@ begin
   begin
     perform lib_predicate.text_equal('text', '[]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a text arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Text equal should take one argument');
 end;
@@ -20,7 +22,9 @@ begin
   begin
     perform lib_predicate.text_equal('text', '{}'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'argument should be a jsonb array');
+      return;
   end;
   perform lib_test.fail('Text equal should take one argument');
 end;
@@ -39,7 +43,9 @@ begin
   begin
     perform lib_predicate.text_not_equal('text', '[]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a text arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Text not equal should take one argument');
 end;
@@ -58,7 +64,9 @@ begin
   begin
     perform lib_predicate.text_start_with('text', '[]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a text arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Text start with should take one argument');
 end;
@@ -78,7 +86,9 @@ begin
   begin
     perform lib_predicate.text_end_with('text', '[]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a text arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Text end with should take one argument');
 end;
@@ -99,7 +109,9 @@ begin
   begin
     perform lib_predicate.timestamptz_before('2020-05-2a', '["2020-05-28 10:07:31.390495+00"]'::jsonb);
   exception
-    when others then return;
+    when others then
+      perform lib_test.assert_equal(sqlerrm, 'invalid input syntax for type timestamp with time zone: "2020-05-2a"');
+      return;
   end;
   perform lib_test.fail('Timestamptz require a valid timestamptz value');
 end;
@@ -111,7 +123,9 @@ begin
   begin
     perform lib_predicate.timestamptz_before('2020-05-28 10:07:31.390495+00', '["not_a_timestamptz"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a timestamptz arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Timestamptz before should take a timestamptz as argument');
 end;
@@ -123,7 +137,9 @@ begin
   begin
     perform lib_predicate.timestamptz_before('2020-05-28 10:07:31.390495+00', '[]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a timestamptz arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Timestamptz before should take a timestamptz as argument');
 end;
@@ -143,7 +159,9 @@ begin
   begin
     perform lib_predicate.timestamptz_after('2020-05-28 10:07:31.390495+00', '["not_a_timestamptz"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a timestamptz arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Timestamptz after should take one argument');
 end;
@@ -163,7 +181,9 @@ begin
   begin
     perform lib_predicate.timestamptz_between('2020-05-28 10:07:31.390495+00', '["2020-05-28 10:07:31.390495+00"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a timestamptz arg value as argument[2]');
+      return;
   end;
   perform lib_test.fail('Timestamptz between should take two argument');
 end;
@@ -175,7 +195,9 @@ begin
   begin
     perform lib_predicate.timestamptz_between('2020-05-28 10:07:31.390495+00', '["2020-05-28 10:07:31.390495+00", "not_timestamptz"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require a timestamptz arg value as argument[2]');
+      return;
   end;
   perform lib_test.fail('Timestamptz between should take two timestamptz argument');
 end;
@@ -187,7 +209,9 @@ begin
   begin
     perform lib_predicate.timestamptz_between('2020-05-28 10:07:31.390495+00', '["2020-05-29 10:07:31.390495+00", "2020-05-28 10:07:31.390495+00"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'argument[1]::timestamptz should be lower then argument[2]::timestamptz');
+      return;
   end;
   perform lib_test.fail('Timestamptz between argument 1 should be < argument 2');
 end;
@@ -210,7 +234,9 @@ begin
   begin
     perform lib_predicate.number_equal('text', '[10]'::jsonb);
   exception
-    when others then return;
+    when others then
+      perform lib_test.assert_equal(sqlerrm, 'invalid input syntax for type integer: "text"');
+      return;
   end;
   perform lib_test.fail('Number equal should take an int value');
 end;
@@ -222,7 +248,9 @@ begin
   begin
     perform lib_predicate.number_equal(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number equal should take one argument');
 end;
@@ -241,7 +269,9 @@ begin
   begin
     perform lib_predicate.number_not_equal(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number not equal should take one argument');
 end;
@@ -260,7 +290,9 @@ begin
   begin
     perform lib_predicate.number_lower(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number lower should take one argument');
 end;
@@ -280,7 +312,9 @@ begin
   begin
     perform lib_predicate.number_lower_equal(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number lower equal should take one argument');
 end;
@@ -300,7 +334,9 @@ begin
   begin
     perform lib_predicate.number_greater(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number greater should take one argument');
 end;
@@ -320,7 +356,9 @@ begin
   begin
     perform lib_predicate.number_greater_equal(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number greater equal should take one argument');
 end;
@@ -340,7 +378,9 @@ begin
   begin
     perform lib_predicate.number_between(10, '["art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[1]');
+      return;
   end;
   perform lib_test.fail('Number between should take two int argument');
 end;
@@ -352,7 +392,9 @@ begin
   begin
     perform lib_predicate.number_between(10, '[10, "art"]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'require an int arg value as argument[2]');
+      return;
   end;
   perform lib_test.fail('Number between should take one argument');
 end;
@@ -364,7 +406,9 @@ begin
   begin
     perform lib_predicate.number_between(10, '[10, 10]'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'argument[1]::int should be lower then argument[2]::int');
+      return;
   end;
   perform lib_test.fail('Number between argument 1 should be < argument 2');
 end;

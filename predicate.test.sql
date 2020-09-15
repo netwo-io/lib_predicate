@@ -81,7 +81,9 @@ begin
       ]
     }'::jsonb);
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'predicate target__id must be recorded in predicate_tree parent config.');
+      return;
   end;
   perform lib_test.fail('Using target__id not linked to tree config should fail.');
 end;
@@ -102,7 +104,9 @@ begin
       ]
     }'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'wrong serialized predicate tree format');
+      return;
   end;
   perform lib_test.fail('Wrongly formatted compound should fail.');
 end;
@@ -117,7 +121,9 @@ begin
       "predicates": [ ]
     }'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'wrong serialized predicate tree format');
+      return;
   end;
   perform lib_test.fail('Wrongly formatted compound should fail.');
 end;
@@ -138,13 +144,15 @@ begin
       ]
     }'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'wrong serialized predicate tree format');
+      return;
   end;
   perform lib_test.fail('Wrongly formatted predicate should fail.');
 end;
 $$ language plpgsql;
 
-create or replace function lib_test.test_case_lib_predicate_tree_upsert_tree_invalid_structure3() returns void as $$
+create or replace function lib_test.test_case_lib_predicate_tree_upsert_tree_invalid_structure4() returns void as $$
 begin
 
   begin
@@ -159,13 +167,15 @@ begin
       ]
     }'::jsonb);
   exception
-    when check_violation then return;
+    when others then
+      perform lib_test.assert_equal(sqlerrm, 'invalid input syntax for type json');
+      return;
   end;
   perform lib_test.fail('Wrongly formatted predicate should fail.');
 end;
 $$ language plpgsql;
 
-create or replace function lib_test.test_case_lib_predicate_tree_upsert_tree_invalid_structure3() returns void as $$
+create or replace function lib_test.test_case_lib_predicate_tree_upsert_tree_invalid_structure5() returns void as $$
 begin
 
   begin
@@ -180,7 +190,9 @@ begin
       ]
     }'::jsonb);
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'value for domain lib_predicate.target_identifier violates check constraint "target_identifier_check"');
+      return;
   end;
   perform lib_test.fail('Wrongly formatted predicate should fail.');
 end;

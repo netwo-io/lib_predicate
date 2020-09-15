@@ -22,7 +22,9 @@ begin
   begin
     perform lib_predicate.target_create('ar', 'Article title', 'text');
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'value for domain lib_predicate.target_identifier violates check constraint "target_identifier_check"');
+      return;
   end;
   perform lib_test.fail('Target with invalid id should not be created');
 end;
@@ -34,7 +36,9 @@ begin
   begin
     perform lib_predicate.target_create('article', 'Article title', 'unexisting_type');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "target" violates foreign key constraint "target_type__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Target with invalid type should not be created');
 end;
@@ -46,7 +50,9 @@ begin
   begin
     perform lib_predicate.target_create('article.title', 'Article title', 'text');
   exception
-    when unique_violation then return;
+    when unique_violation then
+      perform lib_test.assert_equal(sqlerrm, 'duplicate key value violates unique constraint "target_pkey"');
+      return;
   end;
   perform lib_test.fail('Duplicate target id should not be possible.');
 end;
@@ -69,7 +75,9 @@ begin
   begin
     perform lib_predicate.config_create('', 'My first config description');
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'value for domain lib_predicate.label violates check constraint "label_check"');
+      return;
   end;
   perform lib_test.fail('Config should not be created with invalid label');
 end;
@@ -108,7 +116,9 @@ begin
   begin
     perform lib_predicate.config_enable_logical_type('00000000-0000-0000-0000-0000000000c1'::uuid, 'not_existing');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "config__logical_type" violates foreign key constraint "config__logical_type_logical_type__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Not existing logical type should not be activable in config');
 end;
@@ -120,7 +130,9 @@ begin
   begin
     perform lib_predicate.config_enable_logical_type('00000000-0000-0000-ffff-0000000000c0'::uuid, 'all');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "config__logical_type" violates foreign key constraint "config__logical_type_config__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Enable a logical type on an inexisting config should fail.');
 end;
@@ -163,7 +175,9 @@ begin
   begin
     perform lib_predicate.config_enable_target('00000000-0000-0000-0000-0000000000c1'::uuid, 'resource.not_existing');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "config__target" violates foreign key constraint "config__target_target__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Not existing target should not be activable in config');
 end;
@@ -175,7 +189,9 @@ begin
   begin
     perform lib_predicate.config_enable_target('00000000-0000-0000-ffff-0000000000c0'::uuid, 'article.title');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "config__target" violates foreign key constraint "config__target_config__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Enable a target on an inexisting config should fail.');
 end;
@@ -226,7 +242,9 @@ begin
   begin
     perform lib_predicate.widget_create('text', 'Short text');
   exception
-    when unique_violation then return;
+    when unique_violation then
+      perform lib_test.assert_equal(sqlerrm, 'duplicate key value violates unique constraint "widget_pkey"');
+      return;
   end;
   perform lib_test.fail('Duplicate widget should not be possible.');
 end;
@@ -247,7 +265,9 @@ begin
   begin
     perform lib_predicate.widget_delete('cannot_delete');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'update or delete on table "widget" violates foreign key constraint "operator_widget__id_fkey" on table "operator"');
+      return;
   end;
   perform lib_test.fail('In use widget should not be deletable.');
 end;
@@ -273,7 +293,9 @@ begin
   begin
     perform lib_predicate.operator_create('operator_test_not_exist', 'Text is equal to', 'text', 'text');
   exception
-    when check_violation then return;
+    when check_violation then
+      perform lib_test.assert_equal(sqlerrm, 'an operator__id must have a lib_predicate function counterpart.');
+      return;
   end;
   perform lib_test.fail('Create an operator without a bound function should not be possible.');
 end;
@@ -285,7 +307,9 @@ begin
   begin
     perform lib_predicate.operator_create('text_equal', 'Text is equal to', 'text', 'text');
   exception
-    when unique_violation then return;
+    when unique_violation then
+      perform lib_test.assert_equal(sqlerrm, 'duplicate key value violates unique constraint "operator_pkey"');
+      return;
   end;
   perform lib_test.fail('Duplicate operator should not be possible.');
 end;
@@ -297,7 +321,9 @@ begin
   begin
     perform lib_predicate.operator_create('operator_test2', 'Text is equal to', 'texty', 'text');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "operator" violates foreign key constraint "operator_type__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Create an operator with an invalid argument type should not be possible.');
 end;
@@ -309,7 +335,9 @@ begin
   begin
     perform lib_predicate.operator_create('operator_test2', 'Text is equal to', 'text', 'not_existing_widget');
   exception
-    when foreign_key_violation then return;
+    when foreign_key_violation then
+      perform lib_test.assert_equal(sqlerrm, 'insert or update on table "operator" violates foreign key constraint "operator_widget__id_fkey"');
+      return;
   end;
   perform lib_test.fail('Create an operator with an invalid widget should not be possible.');
 end;
